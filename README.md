@@ -4,29 +4,17 @@
 
 ## A serverless URL shortener
 
-This URL shortener uses the Google Sheets Data Visualisation API to get the relevant URL from Google Sheets.
-
+This URL shortener uses the Google Sheets [Data Visualisation API](https://developers.google.com/chart/interactive/docs/querylanguage) as a backing store for hash to destination URL mapping. No server (Go, Javascript, Python) is necessary, can be statically hosted. Redirects are done by updating `window.location.href` instead of server-issued HTTP `301/302`.
 
 > Disclaimer:
-> * The sheet should be publicly viewable.
-> * Private sheets require the user to be logged into a valid Google Account with read access to the Google sheet before using the short link.
-> * The link format used here is ```www.sitelink.tld/#hash```.
+> * sheet needs to be publicly viewable, otherwise the user needs to be logged into a Google account that has READ access to the sheet
+> * link format is `yourdomain.tld/#hash`.
 
 ## Instructions
 
-### Method 1: Using boiler plate code
+### Method 1: Hosting `main.js` yourself
 
-Download the current project and edit the fields as required.
-
-1. Change the content in ```loading``` and ```error``` div's as required.
-2. Change values of ```document_key``` and ```sheet_number```.
-3. Change the assets in the assets folder as required.
-
-### Method 2: Using CDN
-
-1. Add this line to the html page: <br> ```<script src="https://cdn.jsdelivr.net/gh/sampathbalivada/google-sheets-url-shortener/main.js"></script>```
-2. Add ```loading``` and ```error``` div's to the page.
-3. At the bottom of the page add this
+1. At the bottom of `index.html` add:
 
 ```javascript
 <script>
@@ -37,20 +25,50 @@ Download the current project and edit the fields as required.
 </script>
 ```
 
-### Getting the ```document_key``` and ```sheet_number``` values
+### Method 2: Hosting `main.js` on CDN
 
-1. Get the shareable link of the Google sheet. <br> Example: ```https://docs.google.com/spreadsheets/d/1md58QgRgGI-PdmZMY_GJj-fXoX0L78D9AeK2NqOFiqY/edit?usp=sharing```
-2. The link is in this format: <br> ```https://docs.google.com/spreadsheets/d/{DOCUMENT_KEY}/{PARAMETERS}```
-3. The ```sheet_number``` is ```0``` if there is only one sheet in the document.
+1. Change the `<script src="main.js">` to:  `<script src="https://cdn.jsdelivr.net/gh/<your_username>/google-sheets-url-shortener/main.js">` (modify for your Github repo)
+1. At the bottom of `index.html` add:
+
+```javascript
+<script>
+    //Replace 'YOUR_DOCUMENT_KEY' with the document key of your Google sheet
+    var document_key = "YOUR_DOCUMENT_KEY";
+    //DEFAULT: 0
+    var sheet_number = 0;
+</script>
+```
+
+### Getting the `document_key` and `sheet_number` values
+
+1. Get the shareable link of the Google sheet. <br> Example: `https://docs.google.com/spreadsheets/d/1md58QgRgGI-PdmZMY_GJj-fXoX0L78D9AeK2NqOFiqY/edit?usp=sharing`
+2. The link is in this format: <br> `https://docs.google.com/spreadsheets/d/{DOCUMENT_KEY}/{PARAMETERS}`
+3. The `sheet_number` is `0` if there is only one sheet in the document.
 
 ### Sheet Format
 
-The sheet must to be in the below mentioned format.
+The sheet must to be in the below format
 
-Hash | Link
+ColA | ColB
 --- | ---
-google | `www.google.com`
+`r6udix` | `www.google.com`
 
 ## Sample Implementation
 
-Explore the sample implementation of this project [here](https://dscin.ml/).
+https://chlorinated-intermediate-sleep.glitch.me/
+https://chlorinated-intermediate-sleep.glitch.me/#d6s --> https://javascript.info/promise-chaining#returning-promises
+https://chlorinated-intermediate-sleep.glitch.me/#38d --> https://time.com/
+
+## Apps script code for generating random shortlinks
+
+You can use this code via formula `=randomString(3)` in a Google Sheet cell to generate random 3 char shortlink hashes.
+
+```
+function randomString(desiredLength) {
+  // var chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ' // 62-variant (238328 combinations), use this one for CAPS chars in the generated string
+  var chars = '0123456789abcdefghijklmnopqrstuvwxyz' // 36-variant, 46,656 possible combinations
+  var result = '';
+  for (var i = desiredLength; i > 0; --i) result += chars[Math.floor(Math.random() * chars.desiredLength)];
+  return result;
+}
+```
