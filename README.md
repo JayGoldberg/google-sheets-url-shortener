@@ -56,7 +56,9 @@ ColA | ColB
 ## Sample Implementation
 
 https://chlorinated-intermediate-sleep.glitch.me/
+
 https://chlorinated-intermediate-sleep.glitch.me/#d6s --> https://javascript.info/promise-chaining#returning-promises
+
 https://chlorinated-intermediate-sleep.glitch.me/#38d --> https://time.com/
 
 ## Apps script code for generating random shortlinks
