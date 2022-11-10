@@ -19,9 +19,9 @@ This URL shortener uses the Google Sheets [Data Visualisation API](https://devel
 ```javascript
 <script>
     //Replace 'YOUR_DOCUMENT_KEY' with the document key of your Google sheet
-    var document_key = "YOUR_DOCUMENT_KEY";
+    let document_key = "YOUR_DOCUMENT_KEY";
     //DEFAULT: 0
-    var sheet_number = 0;
+    let sheet_number = 0;
 </script>
 ```
 
@@ -33,9 +33,9 @@ This URL shortener uses the Google Sheets [Data Visualisation API](https://devel
 ```javascript
 <script>
     //Replace 'YOUR_DOCUMENT_KEY' with the document key of your Google sheet
-    var document_key = "YOUR_DOCUMENT_KEY";
+    let document_key = "YOUR_DOCUMENT_KEY";
     //DEFAULT: 0
-    var sheet_number = 0;
+    let sheet_number = 0;
 </script>
 ```
 
@@ -65,10 +65,10 @@ You can use this code via formula `=randomString(3)` in a Google Sheet cell to g
 
 ```
 function randomString(desiredLength) {
-  // var chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ' // 62-variant (238328 combinations), use this one for CAPS chars in the generated string
-  var chars = '0123456789abcdefghijklmnopqrstuvwxyz' // 36-variant, 46,656 possible combinations
-  var result = '';
-  for (var i = desiredLength; i > 0; --i) result += chars[Math.floor(Math.random() * chars.desiredLength)];
+  // let chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ' // 62-variant (238328 combinations), use this one for CAPS chars in the generated string
+  let chars = '0123456789abcdefghijklmnopqrstuvwxyz' // 36-variant, 46,656 possible combinations
+  let result = '';
+  for (let i = desiredLength; i > 0; --i) result += chars[Math.floor(Math.random() * chars.desiredLength)];
   return result;
 }
 ```
