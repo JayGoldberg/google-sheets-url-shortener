@@ -8,7 +8,7 @@ function redirect() {
   //proceed if hash is not empty, else stay on the loading page
   if (hash != "") {
     //generate Google Visualization API URL
-    url = generateUrl(hash);
+    let url = generateDatasourceUrl(hash);
     //get the URL to redirect
     let destinationUrl = getDestinationUrl(url);
     //perform redirect
@@ -20,15 +20,11 @@ function redirect() {
   }
 }
 
-//generates Google Visualization API URL
-function generateUrl(hash) {
-  let start =
-    "https://docs.google.com/spreadsheets/d/" +
-    document_key +
-    "/gviz/tq?tqx=out:json&tq=SELECT%20B%20WHERE%20A%20%3D%20%27";
-  let end = "%27&gid=0";
-  let url = start + hash + end;
-  return url;
+// generates Google Visualization API URL
+function generateDatasourceUrl(hash) {
+  let queryString = encodeURIComponent(`SELECT B WHERE A = '${hash}'`);
+  let datasource = `https://docs.google.com/spreadsheets/d/${document_key}/gviz/tq?tqx=out:json&tq=${queryString}&gid=${sheet_number}`;
+  return datasource;
 }
 
 //perform http GET on URL
@@ -41,6 +37,7 @@ function httpGetAsync(theUrl, callback) {
 
 //get destination URL from the sheet
 function getDestinationUrl(url) {
+  let destinationUrl;
   try {
     let response = httpGetAsync(url);
     let response_clean = response
@@ -48,7 +45,7 @@ function getDestinationUrl(url) {
       .replace(");", "");
     let json_object = JSON.parse(response_clean);
     console.log(json_object);
-    let destinationUrl = json_object["table"]["rows"]["0"]["c"]["0"]["v"];
+    destinationUrl = json_object["table"]["rows"]["0"]["c"]["0"]["v"];
   } catch (error) {
     displayError();
   }
