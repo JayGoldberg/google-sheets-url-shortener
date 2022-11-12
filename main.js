@@ -1,55 +1,52 @@
 // Needs document key: document_key and sheet number: sheet_number
 
 function redirect() {
-  //get hash from URL
-  let hash = window.location.hash.slice(1);
+  // get hash from URL, handle hash-style (#) and param-style (?)
+  let hash = "";
+
+  if (window.location.hash.length) {
+    hash = window.location.hash.slice(1);
+  }
+  if (window.location.search) {
+    hash = window.location.search.slice(1);
+  }
   console.log(hash);
 
-  //proceed if hash is not empty, else stay on the loading page
-  if (hash != "") {
-    //generate Google Visualization API URL
-    let url = generateDatasourceUrl(hash);
-    //get the URL to redirect
-    let destinationUrl = getDestinationUrl(url);
-    //perform redirect
-    if (destinationUrl != undefined) {
-      window.location.href = destinationUrl;
-    } else {
-      displayError();
-    }
+  // proceed if hash is not empty, else stay on the loading page
+  if (!hash || !document_key) {
+    displayError();
+    return;
   }
+
+  (async function fetchAndClean() {
+    const destinationUrl = await fetch(generateDatasourceUrl(hash))
+      .then((response) => response.text()) // the return value of a then() call is again a promise
+      .then((data) => {
+        let sheetsJsonClean = JSON.parse(
+          data
+            .replace("/*O_o*/\ngoogle.visualization.Query.setResponse(", "")
+            .replace(");", "")
+        );
+        return sheetsJsonClean["table"]["rows"]["0"]["c"]["0"]["v"];
+      })
+      .catch((error) => console.log(error));
+
+    if (!destinationUrl) {
+      displayError();
+      return;
+    }
+
+    console.log(destinationUrl);
+    window.location.href = destinationUrl;
+  })();
 }
 
 // generates Google Visualization API URL
 function generateDatasourceUrl(hash) {
   let queryString = encodeURIComponent(`SELECT B WHERE A = '${hash}'`);
+  // TODO: check get sheet_number, or set to 0
   let datasource = `https://docs.google.com/spreadsheets/d/${document_key}/gviz/tq?tqx=out:json&tq=${queryString}&gid=${sheet_number}`;
   return datasource;
-}
-
-//perform http GET on URL
-function httpGetAsync(theUrl, callback) {
-  let Httpreq = new XMLHttpRequest(); // a new request
-  Httpreq.open("GET", theUrl, false);
-  Httpreq.send(null);
-  return Httpreq.responseText;
-}
-
-//get destination URL from the sheet
-function getDestinationUrl(url) {
-  let destinationUrl;
-  try {
-    let response = httpGetAsync(url);
-    let response_clean = response
-      .replace("/*O_o*/\ngoogle.visualization.Query.setResponse(", "")
-      .replace(");", "");
-    let json_object = JSON.parse(response_clean);
-    console.log(json_object);
-    destinationUrl = json_object["table"]["rows"]["0"]["c"]["0"]["v"];
-  } catch (error) {
-    displayError();
-  }
-  return destinationUrl;
 }
 
 // hide the loading page and display error message
